@@ -1,0 +1,17 @@
+Motion/Error/Velocity/WheelB
+Motion/Sensor/Velocity/WheelB
+Diagnosis/Active/WheelB/Error
+Device/SubDeviceList/WheelB/Speed/Sensor/positionChainMREMotor
+Device/SubDeviceList/WheelB/ElectricCurrent/Sensor/Gain
+Device/SubDeviceList/WheelB/Stiffness/Actuator/Name
+Device/SubDeviceList/WheelB/Stiffness/Actuator/Value
+Device/SubDeviceList/WheelB/Speed/Actuator/IMax
+Device/SubDeviceList/WheelB/ElectricCurrent/Sensor/Value
+Device/SubDeviceList/WheelB/Stiffness/Actuator/Max
+Device/SubDeviceList/WheelB/Speed/Sensor/Register
+Device/SubDeviceList/WheelB/Stiffness/Actuator/Min
+Device/SubDeviceList/WheelB/ElectricCurrent/Sensor/ShuntResistance
+Device/SubDeviceList/WheelB/ElectricCurrent/Sensor/Status
+Device/SubDeviceList/WheelB/ElectricCurrent/Sensor/Register
+Device/SubDeviceList/WheelB/ElectricCurrent/Sensor/Max
+

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<package>
+
+  <name>pepper_interface</name>
+  <version>1.0.0</version>
+  <description>playful forward and inverse kinematics</description>
+
+  <license>LGPL</license>
+
+  <author email="vincentberenz@tuebingen.mpg.de">Vincent Berenz</author>
+  <author email="lherath@tuebingen.mpg.de">Lahiru Herath</author>
+
+  <maintainer email="vincentberenz@tuebingen.mpg.de">Vincent Berenz</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+  </export>
+
+</package>

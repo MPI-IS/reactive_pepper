@@ -1,0 +1,60 @@
+<launch>
+
+<include file="$(find pepper_interface)/launch/pepper_interface.launch" />
+
+<!-- The new trasnform publisher with adjusted values after extrinsic calibration (X Y Z R P Y)-->
+<node pkg="tf2_ros" name="depth_to_top_camera_frame_publisher" type="static_transform_publisher"
+        args="-0.0395752 0.0411942 -0.0344326 -0.000907713 0.0305095 0.00905948
+        CameraTop_optical_frame CameraDepth_optical_frame"/> 
+
+<!-- Nodelet manager for image pipeline-->
+<node pkg="nodelet" type="nodelet" args="manager" name="manager" output="screen"/>
+
+<!-- First need to rectify the depth image-->
+<node pkg="nodelet" type="nodelet" name="rectify_depth" args="load image_proc/rectify manager">
+    <remap from="camera_info" to="/pepper_interface/depth/camera_info"/>
+    <remap from="image_mono" to="/pepper_interface/depth/image"/>
+    <remap from="image_rect" to= "/pepper_interface/depth/image_rectified"/>
+</node>
+
+
+<!-- rectifying the rgb image before feeding to open pose -->
+<node pkg="nodelet" type="nodelet" name="rectify_rgb" args="load image_proc/rectify manager">
+    <remap from="camera_info" to="/pepper_interface/rgb/camera_info"/>
+    <remap from="image_mono" to="/pepper_interface/rgb/image"/>
+    <remap from="image_rect" to= "/pepper_interface/rgb/image_rectified"/>
+</node>
+
+<!-- registering the depth to the OpenPose image frame -->
+<node pkg="nodelet" type="nodelet" name="register_cloud" args="load depth_image_proc/register manager">
+    <remap from="depth/camera_info" to="/pepper_interface/depth/camera_info"/>
+    <remap from="rgb/camera_info" to="/pepper_interface/rgb/camera_info"/>
+    <remap from = "depth/image_rect" to="/pepper_interface/depth/image_rectified"/>
+    <remap from = "depth_registered/image_rect" to = "/pepper_interface/depth_registered_rgb/image_rectified"/>
+</node>
+
+<!-- open pose computations -->
+<node pkg= "playful_openpose_node" type = "playful_openpose_node" name = "playful_openpose_node" output= "screen">
+    <remap from="image_in" to = "/pepper_interface/rgb/image_rectified"/>
+    <remap from="cam_info_in" to = "/pepper_interface/rgb/camera_info"/>
+    <remap from="image_out" to = "/open_pose/image"/>
+    <remap from="cam_info_out" to = "/open_pose/camera_info"/>
+    <remap from="key_points_out" to = "/open_pose/key_points"/>
+</node>
+
+<!-- combining the cloud and RGB to create a RGBD cloud -->
+<node pkg="nodelet" type="nodelet" name="rgb_cloud" args="load depth_image_proc/point_cloud_xyzrgb manager">
+    <remap from="rgb/camera_info" to="/open_pose/camera_info"/>
+    <remap from = "rgb/image_rect_color" to="/open_pose/image"/>
+    <remap from = "depth_registered/image_rect" to = "/pepper_interface/depth_registered_rgb/image_rectified"/>
+</node>
+
+<!-- converting the openpose image to depth -->
+<node pkg="playful_openpose_node" type="playful_openpose_depth_node" name="depth_conversion" output="screen">
+    <remap from="depth_image_in" to = "/pepper_interface/depth_registered_rgb/image_rectified"/>
+    <remap from="key_points_in" to = "/open_pose/key_points"/>
+    <remap from="rgb_cam_info_in" to = "/open_pose/camera_info"/>
+    <remap from="human_out" to = "/playful/open_pose/human"/>
+</node>
+
+</launch>

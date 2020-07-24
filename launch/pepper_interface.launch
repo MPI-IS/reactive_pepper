@@ -1,0 +1,7 @@
+<launch>
+
+<arg name="version" default="1.0" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find pepper_interface)/urdf/pepper_robot.xacro" />
+  <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find pepper_interface)/rviz/pepper_interface.rviz" />
+</launch>

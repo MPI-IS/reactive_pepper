@@ -1,0 +1,107 @@
+
+A. INTRINSIC
+------------
+
+sudo apt-get install ros-indigo-image-pipeline
+
+http://wiki.ros.org/camera_calibration
+
+in pepper_interface/scripts/configuration/configuration.py set calibration_on to 1
+
+
+print image camera-calibration.png
+
+
+
+measure size of a square in m
+
+start camera-calibration/run_calibration.py
+
+8*6 : size of chessboard -1 (????)
+0.032 : size of square in meter
+
+cover physically the right eye of the pepper robot with a patch/post-it, and then in a terminal :
+rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.0235 image:=/pepper_interface/rgb/image
+
+move around the chessboard in front of robot
+
+after clicking on calibration, values such as:
+
+camera matrix
+378.709715 0.000000 135.687811
+0.000000 357.715417 81.462150
+0.000000 0.000000 1.000000
+
+distortion
+0.278199 -0.303702 -0.051760 -0.026933 0.000000
+
+rectification
+1.000000 0.000000 0.000000
+0.000000 1.000000 0.000000
+0.000000 0.000000 1.000000
+
+projection
+398.258698 0.000000 131.354102 0.000000
+0.000000 367.378265 75.044787 0.000000
+0.000000 0.000000 1.000000 0.000000
+
+
+copy camera_matrix, distortion, rectificatio and projection respectively to:
+infomsg.K, informsg.D, infomsg.R and infomsg.P in pepper_interface/scripts/ros/camera_pub.py def rgb_image_messages
+
+
+rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.0235 image:=/pepper_interface/ir/image
+
+and copy values to depth_image_messages AND ir_image_messages (no distortion and rectification for depth_image_messages)
+
+
+A. EXTRINSIC
+------------
+
+clone https://github.com/ros-naoqi/extrinsic_calibration
+(note: has been forked: https://git-amd.tuebingen.mpg.de/amd-clmc/ros-naoqi-extrinsic-calibration)
+
+change launch/extrinsic_calibration_pepper.launch
+
+Note: change pattern_cols, pattern_rows, pattern_size depending on chessboard used
+      change images_folder to something with writting rights
+
+<launch>
+  <arg name="camera" default="naoqi_driver_node/camera" />
+
+  <node pkg="extrinsic_calibration" type="extrinsic_calibration" name="extrinsic_calibration_node" output="screen" cwd="node">
+    <param name="depth_img_topic" value="/pepper_interface/ir/image" />
+    <param name="rgb_img_topic" value="/pepper_interface/rgb/image" />
+
+    <param name="camera_info_depth_topic" value="/pepper_interface/ir/camera_info" />
+    <param name="camera_info_rgb_topic" value="/pepper_interface/rgb/camera_info" />
+
+    <param name="images_folder" value="/tmp/images" />
+
+    <param name="pattern_cols" value="9" />
+    <param name="pattern_rows" value="7" />
+    <param name="pattern_size" value="0.032" />
+  </node>
+
+</launch>
+
+
+start pepper_interface/camera_calibration/run_calibration.py
+
+roslaunch pepper_interface/launch/pepper_interface.launch
+
+
+compile in catkin workspace and roslaunch extrinsic_calibration_pepper.launch
+
+
+press s to save pairs, after 30> pairs, press c, getting something like:
+
+[ INFO] [1541524914.284382131]: Pose estimation error: 36.7371
+[ INFO] [1541524914.284415701]: CameraTop_optical_frame to CameraDepth_optical_frame : XYZ: -0.00273615 0.000827565 0.0942473
+[ INFO] [1541524914.284429234]: CameraTop_optical_frame to CameraDepth_optical_frame : RPY: -0.00490817 -0.161284 0.00503566
+[ INFO] [1541524914.284452124]: CameraDepth_optical_frame to Head : XYZ: 0.180257 0.00273615 0.162012
+[ INFO] [1541524914.284467456]: CameraDepth_optical_frame to Head : RPY: -1.57651 0.00497031 -1.40951
+[ INFO] [1541524914.284477716]: Image pair: 33
+
+copy the XYZ and RPY values of CameraTop_optical_frame to CameraDepth_optical_frame to playful_pepper/launch/pepper_open_pose2.launch
+

@@ -1,0 +1,15 @@
+[I] 21653 qimessaging.session: Session listener created on tcp://0.0.0.0:0
+[I] 21653 qimessaging.transportserver: TransportServer will listen on: tcp://192.168.0.101:40529
+[I] 21653 qimessaging.transportserver: TransportServer will listen on: tcp://127.0.0.1:40529
+[W] 21684 qi.path.sdklayout: No Application was created, trying to deduce paths
+
+pepper interface: failed to connect to tablet proxy: 	ALProxy::ALProxy
+	Can't find service: ALTabletService
+(expected if you are using naoqi version < 2.5)
+
+()
+()
+()
+
+100
+
